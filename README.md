@@ -1,4 +1,9 @@
-# Project_1
-Attacking Cryptographic Hashes
+# Security
+Attacking Cryptographic Hashes,
+Web Security,
+Networking,
+App Security,
+Forensics Project,
+and 5 homeworks
 
-For an intro to security class, https://ecen5032.org/.
+For more on this intro to computer security class, https://ecen5032.org/.
