@@ -1,0 +1,199 @@
+Author: Nic Williams
+ECEN 5032 - Intro to Security - HW1
+1/31/17
+
+-----
+1. {Checkout} Scenario
+-----
+Assumptions:
+We will assume there is an attentive and competent loss prevention specialist
+that has been hired by King Soopers that mans the front kiosk by the self Checkout
+registers that functions as the attendant (that helps if you can't find your item
+prices, etc.). This means nobody can leave the store without using either a self
+checkout kiosk or a regular one. Nobody can leave the store with a cart of things,
+or walk out with handfuls of items, or even hide them in clothes, the LPS is that good.
+
+Assets:
+- Physical assets - the building, items inside, customers, carts, car park,
+supporting infrastructure (electric, water, etc.), and the loss prevention specialist.
+- Information Assets - data on what is on the floor and what is in the stocking room,
+item classification and pricing system(i.e. barcodes), rewards program and structure,
+operational procedures and continuity plans.
+- Software Assets - application running the point of sale (POS), and credit card readers.
+
+Threats:
+- Attack on physical assets - either breaking or destroying company property in
+the hope that the loss prevention specialist will not notice a thief leaving with
+items, as they are too busy solving the physical problem.
+- Attack on information assets - changing the record of what the store possesses so
+it won't notice when inventory disappears, changing the pricing system for a discount
+or otherwise cheating the exchange, getting discounts using forged rewards credentials,
+or changing the continuity plans to allow for a more successful physical attack.
+- Attack on software assets - modifying how the POS operates so it doesn't ring up
+items, or modifying the CC readers so they reach a server that always greenlights the
+transaction.
+
+Countermeasures:
+- Excellent procedures - having continuity plans for when the building is under siege,
+when it is being damaged, and when various physical threats are made (power being cut,
+etc.) would allow for other employees to handle the situation at hand (starting a generator,
+putting out fires, detaining active harmers, etc.) while the loss specialist ensures no
+products are lost.
+- Securing information - put the stock information on a spreadsheet on a computer that
+can't be reached by the internet, and is in a locked room that few have access to. That
+way workers will always know what they should see on the floor. Have the pricing system
+be static (meaning you upload which things are on sale in the morning to each scanner
+and don't change all day) and then turn off network connectivity to the scanners. Have
+the rewards program require an official picture, magstripe card, and verify an address
+registered in the system so nobody can forge the documents. Only allow the procedures to
+be changed by franchise owners, not just store managers, that way the cost to actually
+change the plans is years of service and promotion in a company, which isn't worth
+the work to steal.
+- Tamper-proof/evident POS - again, with no network connectivity after the mornings, it
+would only be viable to tamper with these computers in person. Put ink cannons and alarms
+inside and only train technicians to disarm them. Make the CC readers have a static server
+to contact, and if they can't reach it, deny the sale. This way no modifications can come
+to the system without significant effort (i.e. hacking the computer while hard wired to it,
+bribing a technician and hoping he doesn't blackmail you).
+
+-----
+2. {NSA} Scenario
+-----
+Assumptions: Buildings are immune to grand theft and attack. Nobody can get in
+without card access or with any sort of weapon or harmful chemicals,
+buildings are reinforced, and at the first sign of trouble access to inside information
+shuts off until override from a national office comes.
+
+
+Assets:
+- Physical Assets - Technology, servers, computers, and people. The NSA has some of
+the most advanced super computers in the country (read: costly). The servers maintain
+thousands of confidential documents, conversations, texts, and others in an effort
+to protect the public and get a leg up on the enemy. The computers power the software
+that is used to extract information. Finally, the people have knowledge most of the
+world does not, and need to be accounted for.
+- Information Assets - listen and record enemy (constituent, at times) radio transmissions, a
+list of bad states and men who seek to harm people and other states, write-ups of
+all national information gathering techniques, and archives of previous and ongoing
+domestic and world investigations.
+- Software Assets - breaking into "secure" technologies in order to gain operational intelligence
+on an enemy, gaining access to secure communication channels to eavesdrop on the enemy and gain
+knowledge passed in confidence, ability to create specific cyber attacks to bring down other
+infrastructure.
+
+Threats:
+- Attacks on physical assets - outside states coming to employees whether exploiting a vice or
+bribery or coercion (kidnapping family members, etc.) to vicariously acquire access to the
+system. Giving an employee a bugged outside memory device from a friend or coworker that records
+data on the servers and computers. Using a bugged computer to control virtually to redirect server
+information to other places to record, then send to the correct target. Ultimately compromising the
+technological structure of the agency (creating a botnet or ways into their system remotely).
+- Attacks on information assets - Using the technology to listen to particular people to gain information
+into blackmailiing them (a competitor out of business, or for money), selling information gathering
+techniques to developing countries if acquired, and leaking archives to enemies of the state to give
+them an upper hand.
+- Attacks on software assets - giving intentionally false messages through all channels to see which creates a
+reaction (figuring out which are compromised), and continually spreading false info. Taking this software
+and using it on your own leader or managers to gain information on them, acquiring these cyber attacks and
+either selling them, or using them.
+
+Countermeasures:
+* every threat comes from getting to the employees firstly, just about, so let's combat that *
+- Securing employee information - not letting the outside world know who works, what they do, and what
+they know. Partitioning each employee to only access information relevant to their work, and forbidding
+collaboration to workers from different sectors. Monitoring when devices are attached to the computer,
+and if there are secure files on the computer, it shuts down to not allow file transfers. Questionable
+computers get quarantined, and servers discontinue communication with it.
+- Collecting employee information - knowing who their family is, friends, lovers, and creating an ability
+to protect them if need be. Finding out if your employees have vices that can be exploited (through
+interviews of friends and references), if they are susceptible to bribes (monitoring bank activity
+and lifestyle choices in the even they're given a new unregistered bank account), and maintaining a strict
+support policy so nobody is in trouble if they're in a position to be coerced. Monitoring them to make
+sure they aren't in contact with anyone they shouldn't be, and that they are secure in how they
+relate to their families and partners about their work.
+- Recording work done - development of algorithms that will reference the work an employee should be doing
+and the files they are accessing, and flags them if those two don't align. Making sure files aren't being
+transferred off site for any reason, and ensuring that the computers are immune to any outside access.
+
+-----
+3. {TSA} Scenario
+-----
+Assumptions: No passengers can make it through security without a boarding pass (some kind of ID required) that
+is pre-screened by the airline. No passengers can escape security (no lines skipped over/through). No significant
+distractions can be made to take security officers away from their jobs, and no amount of brute force, bribery,
+or weapons will allow passengers through, either. We are to assume it's a secure facility that all passengers
+must go through.
+
+Assets:
+- Physical Assets - airplanes, passengers and their possessions, the facility itself (planes and airports would make
+for good smuggling holding areas, assuming there isn't great security in/around them).
+- Information Assets - logistical information (where planes will be and when), passenger identification information,
+cargo itinerary for planes, items passengers are carrying.
+- Software Assets - body scanners and their modeling software, x-ray machines and their display software
+
+Threats:
+- Attacks on physical assets - passengers may try and enter the cargo holds of airplanes to steal items, money,
+or anything being transported. Passengers may try and subtly steal items from other passengers. Passengers may try and
+hide in places or hide objects within the airport to gain an advantage over security.
+- Attacks on information assets - Passengers might try and learn where certain passengers will be at various times.
+Passengers might try and skim other passenger identification information to gain access to secure areas they typically
+wouldn't be allowed to. They might try and obtain cargo itinerary to see what local/federal/business items are being
+transported to plan a heist or forge documents to smuggle their own objects from airport to airport. Passengers may
+try and use the x-ray machines to see what other passengers are carrying on them and either attempt to steal it, or
+sell the information.
+- Attacks on software assets - changing the display of the scanners so certain textures are shown as normal or not
+flagged, changing the sensor calibration so they fail completely in some circumstances, changing where the x-ray
+machine routes the display so it gets projected digitally to another location.
+
+Countermeasures:
+- Make thieves plan - make sure every door that allows people access to airport assets is key carded, or manned with a
+guard checking IDs. Ensure that when these doors are broken into, there is an alarm system and a response team. To
+protect from individual theft, ensure the airplane crew are adequately trained in zone scanning and remain attentive
+in the cabin during the flight. Finally, put randomly roving teams throughout the airport that make sure nothing
+looks suspicious and that nobody is loitering too long in unpopulated areas.
+- Disconnect from networks - have the computers load flight itineraries at random times in the mornings, and as flights
+change have the updates pushed hardwired through a network. In the event of a power loss or line cut, TSA would have to
+employ more complete searches, delaying everyone, if not, shutting down the airport entirely. Keep cargo itineraries on
+paper, and the pilot/crew's eyes only, and mark every container inconspicuously. This way nothing can be forged or stolen.
+Ensure the viewing ports for the x ray machines are polarized so nobody that isn't directly looking at the screen will
+be able to see anything.
+- No virtual updates - require all security patches to be from another computer hardwired, or a flash drive, or some
+kind of device that must be physically present. Make sure only one employee is responsible for the changes, and all
+other employees know who they are. This way, nobody besides that one person could be able to change the systems
+functionality. Don't allow passengers past certain points, or too close to ports, or anything of the type, and no
+software changes will come.
+
+-----
+4. {Original} Scenario
+-----
+Explanation: deterring criminals from breaking into a house to steal valuables.
+
+Assumptions: The criminals will want to enter the building quietly, so we can assume no explosives will open any doors,
+no commercial machinery will be used, and the thieves aren't in a group of more than 5 (cop watch, wheelman, security
+expert, one to watch for tenants, one to appraise and steal things and direct crewmen). Ultimately these 5 will not
+destroy the house (i.e. cause a massive plumbing failure), as they are after what is inside. They will not kill the
+tenants if seen, they will leave.
+
+Assets:
+- Physical Assets - Tenants, objects of art/clothing/valuables inside the house, vehicles in the garage, infrastructure
+(power, water, etc.).
+- Information Assets - Where each person is sleeping, what each room/door has for security, and what the tenants will do
+as a countermeasure.
+- Software Assets - Garage door openers, security system software, internet and smart objects (TV/dvd/phone/etc.).
+
+Threats:
+- Attacks on physical assets - criminals may come in to ransom the tenants. The theives may try to cut power to the home
+so most security countermeasures fail. They may try and locate the keys to cars and heist them.
+- Attacks on information assets - acquiring blueprints to the house, working for the security company or being friends
+of the owners, and having purchase history on the owners.
+- Attacks on software assets - opening doors from the outside, disabling the system remotely, using the objects to unlock
+doors or turn off lights in certain places.
+
+Countermeasures:
+- Secrecy - ensure a safe room is in the house accessible to all. Have a backup generator in the room, or a battery to power
+the crucial systems. Lock the keys in the safe room, and leave other less valuable objects available in the house, guarded
+by motion sensors.
+- Weapons - assuming the thieves are friends of the owners, the only fallback is a contingency known only to the owners,
+not anywhere available to the public. In which case the defenders would have the advantage.
+- disable the IOT - having fewer susceptible 'smart' objects in the house allows for fewer points of entry. Having the system
+only accessible by a mainframe of the company would deter any thief from accessing it.
