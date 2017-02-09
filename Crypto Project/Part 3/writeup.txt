@@ -1,0 +1,15 @@
+Authors: Nicolas Carson && Nic Williams
+
+(1)
+We were able to take advantage of the length-extension properties of MD5 to create valid
+tokens without user input. A more secure option would be to use a keyed hash function or HMAC.
+If the token included the user's password, then, an attacker would need to know the password
+to create the hash. Making the token much more secure. If the server and user were the only
+two with knowledge of the password, then they would be the only entities creating valid tokens.
+This way the adversary, assuming they do not know the password, cannot forge a valid token.
+
+(2)
+Essentially this would allow an attacker to "forge" the digital signature those softwares
+use for message integrity checks. If the message has been compromised (e.g. I give you
+malware or ransomware) the computer would not know the difference and execute the files
+thinking they were legitimate.
