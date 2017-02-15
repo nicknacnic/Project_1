@@ -1,0 +1,391 @@
+# ECEN 5032 HW 2 - Cryptanalysis
+# Nic Williams
+
+# Problem 1:
+key=boulder
+
+Using a program my partner researched to build (will be attached at end of file), the Kasiski analysis found that a key of 7 characters was most likely (but also included 2,11,15,16,9, etc.). The first guess the script made was 'boulder' but every subsequent guess was 'boulderxxxxx' where the x's were the next guess. We thought the script was either 'bouldercolorado' or 'boulder' so we went online (http://www.cs.du.edu/~snarayan/crypt/vigenere.html) and tried them both. Boulder worked, eventually outputting:
+
+"cryptographyisthepracticeandstudyoftechniquesforsecurecommunicationin
+thepresenceofthirdpartiescalledadversariesmoregenerallyitisaboutconstruc
+tingandanalyzingprotocolsthatovercometheinfluenceofadversariesandwhichar
+erelatedtovariousaspectsininformationsecuritysuchasdataconfidentialityda
+taintegrityauthenticationandnonrepudiationmoderncryptographyintersectsth
+edisciplinesofmathematicscomputerscienceandelectricalengineeringmoderncr
+yptographyisheavilybasedonmathematicaltheoryandcomputersciencepracticecr
+yptographicalgorithmsaredesignedaroundcomputationalhardnessassumptionsma
+kingsuchalgorithmshardtobreakinpracticebyanyadversaryitistheoreticallypo
+ssibletobreaksuchasystembutitisinfeasibletodosobyanyknownpracticalmeansc
+ryptologyrelatedtechnologyhasraisedanumberoflegalissuestheelectronicfron
+tierfoundationwasinvolvedinacaseintheunitedstateswhichquestionedwhetherr
+equiringsuspectedcriminalstoprovidetheirdecryptionkeystolawenforcementis
+unconstitutionaltheeffarguedthatthisisaviolationoftherightofnotbeingforc
+edtoincriminateoneselfasgiveninthefifthamendm"
+
+### code used to solve part 1:
+# Vigenere Cipher Hacker
+# Authors: Nicolas Carson && Nic Williams
+# Reference: http://inventwithpython.com/hacking (BSD Licensed)
+
+from __future__ import print_function #added so that python 3 functions are avaliable in python2
+import itertools, re
+import vigenereCipher, pyperclip, freqAnalysis, detectEnglish
+
+LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+SILENT_MODE = False # if set to True, program doesn't print attempts
+NUM_MOST_FREQ_LETTERS = 4 # attempts this many letters per subkey
+MAX_KEY_LENGTH = 16 # will not attempt keys longer than this
+NONLETTERS_PATTERN = re.compile('[^A-Z]')
+
+
+def main():
+    ciphertext = """DFSAWSXSOJSBMJUVYAUETUWWPDRUTHOOBSWUSWSQMHVSMQRVJFQOCHGFNAOYLGRUWIYLRK
+ISJCHWVOQYZIXYJFXADVKJSMNDPCFRUOYIITOLTHWDPFYRHRVSOFWBMKJGUMRYKDCHDWVL
+DHCYJEEEOHLOCQJBAAUSKPQIWVXYBHIGHVTPAYEKIZOTFFHRTFCZLGZVSGUCLIJBBXHKMT
+IOLPUICBHYOWSMBFCZXWRTDYNWWZOWHQRVDBHCZQWVDILTWCJVQBLVHRUOWZQJZESHELEC
+JHSODXRJBNPJVZUMUFWLVOHCNDXZPBUYGRFOFYAXHZBHCZQQFESLYFVPQHIRUEGIMCYWII
+TSWEVXYFRCDFMGMWHPVSWNONSHQRUWWDFSDQINPUWTJSHNHEEESFPFXIJQUWHRXJBYPUME
+HAIOHVEDFSAWSXSOJSBMJISUGLPPCOMPGSENONSHQRUWWLOXYFCLJDRUDCGAXXVSGWTHRT
+FDLLFXZDSWCBTKPULLSLZDOFRRVZUVGDDVVESMTJRVEOLZXRUDCGAXXRUWIYDPYBFXYHWJ
+BGMFPTKJCHDPEBJBADXGYBZAZUMKIAMSDVUUCVCHEBJBJCDGKJQYMBEEZOXGHVJBFSTWMJ
+UVYZUIKJQUWOCGPGMTEPVUCVCHEBTIWSDWPTHYXEYKJHCDLRWFOMTEPVUCXZVSSZOHJNRF
+XBJCDGKJQUWPIROGWCBTKPZIRBVVMONPGXVDVHZOSXZVUDUEZTSXLQYDCSLZIPVHOFTVWL
+FGNSHICFQNCRRZDTLZQXZFFZZXRUBHCZQARTWHGRPMFRCYDGRTSCYWLVVBCEHHJUONPVAY
+JQBBXIJUWIYHHNISNSHVIFEOTUMEHGODSITUSXNUMDJBUWVXFQFIGLHVUVYTUHVDFSAWMF
+OYYJVXFMOQPQJFSQYXHRKJGOYFSETHCEXXZPBUWWLVFTZLUKLFRNSDXKIWMTVEMJCFLWMF
+OCZEKIIJUBERJEPHVPLRXGCLNHHKPWHNUMDJBUEHSEFGYWIEJHWPPQMEUVYQLJKIOGPQHD"""
+    hackedMessage = hackVigenere(ciphertext)
+
+    if hackedMessage != None:
+        print('Copying hacked message to clipboard:')
+        print(hackedMessage)
+        pyperclip.copy(hackedMessage)
+    else:
+        print('Failed to hack encryption.')
+
+
+def findRepeatSequencesSpacings(message):
+    # Goes through the message and finds any 3 to 5 letter sequences
+    # that are repeated. Returns a dict with the keys of the sequence and
+    # values of a list of spacings (num of letters between the repeats).
+
+    # Use a regular expression to remove non-letters from the message.
+    message = NONLETTERS_PATTERN.sub('', message.upper())
+
+    # Compile a list of seqLen-letter sequences found in the message.
+    seqSpacings = {} # keys are sequences, values are list of int spacings
+    for seqLen in range(3, 6):
+        for seqStart in range(len(message) - seqLen):
+            # Determine what the sequence is, and store it in seq
+            seq = message[seqStart:seqStart + seqLen]
+
+            # Look for this sequence in the rest of the message
+            for i in range(seqStart + seqLen, len(message) - seqLen):
+                if message[i:i + seqLen] == seq:
+                    # Found a repeated sequence.
+                    if seq not in seqSpacings:
+                        seqSpacings[seq] = [] # initialize blank list
+
+                    # Append the spacing distance between the repeated
+                    # sequence and the original sequence.
+                    seqSpacings[seq].append(i - seqStart)
+    return seqSpacings
+
+
+def getUsefulFactors(num):
+    # Returns a list of useful factors of num. By "useful" we mean factors
+    # less than MAX_KEY_LENGTH + 1. For example, getUsefulFactors(144)
+    # returns [2, 72, 3, 48, 4, 36, 6, 24, 8, 18, 9, 16, 12]
+
+    if num < 2:
+        return [] # numbers less than 2 have no useful factors
+
+    factors = [] # the list of factors found
+
+    # When finding factors, you only need to check the integers up to
+    # MAX_KEY_LENGTH.
+    for i in range(2, MAX_KEY_LENGTH + 1): # don't test 1
+        if num % i == 0:
+            factors.append(i)
+            factors.append(int(num / i))
+    if 1 in factors:
+        factors.remove(1)
+    return list(set(factors))
+
+
+def getItemAtIndexOne(x):
+    return x[1]
+
+
+def getMostCommonFactors(seqFactors):
+    # First, get a count of how many times a factor occurs in seqFactors.
+    factorCounts = {} # key is a factor, value is how often if occurs
+
+    # seqFactors keys are sequences, values are lists of factors of the
+    # spacings. seqFactors has a value like: {'GFD': [2, 3, 4, 6, 9, 12,
+    # 18, 23, 36, 46, 69, 92, 138, 207], 'ALW': [2, 3, 4, 6, ...], ...}
+    for seq in seqFactors:
+        factorList = seqFactors[seq]
+        for factor in factorList:
+            if factor not in factorCounts:
+                factorCounts[factor] = 0
+            factorCounts[factor] += 1
+
+    # Second, put the factor and its count into a tuple, and make a list
+    # of these tuples so we can sort them.
+    factorsByCount = []
+    for factor in factorCounts:
+        # exclude factors larger than MAX_KEY_LENGTH
+        if factor <= MAX_KEY_LENGTH:
+            # factorsByCount is a list of tuples: (factor, factorCount)
+            # factorsByCount has a value like: [(3, 497), (2, 487), ...]
+            factorsByCount.append( (factor, factorCounts[factor]) )
+
+    # Sort the list by the factor count.
+    factorsByCount.sort(key=getItemAtIndexOne, reverse=True)
+
+    return factorsByCount
+
+
+def kasiskiExamination(ciphertext):
+    # Find out the sequences of 3 to 5 letters that occur multiple times
+    # in the ciphertext. repeatedSeqSpacings has a value like:
+    # {'EXG': [192], 'NAF': [339, 972, 633], ... }
+    repeatedSeqSpacings = findRepeatSequencesSpacings(ciphertext)
+
+    # See getMostCommonFactors() for a description of seqFactors.
+    seqFactors = {}
+    for seq in repeatedSeqSpacings:
+        seqFactors[seq] = []
+        for spacing in repeatedSeqSpacings[seq]:
+            seqFactors[seq].extend(getUsefulFactors(spacing))
+
+    # See getMostCommonFactors() for a description of factorsByCount.
+    factorsByCount = getMostCommonFactors(seqFactors)
+
+    # Now we extract the factor counts from factorsByCount and
+    # put them in allLikelyKeyLengths so that they are easier to
+    # use later.
+    allLikelyKeyLengths = []
+    for twoIntTuple in factorsByCount:
+        allLikelyKeyLengths.append(twoIntTuple[0])
+
+    return allLikelyKeyLengths
+
+
+def getNthSubkeysLetters(n, keyLength, message):
+    # Returns every Nth letter for each keyLength set of letters in text.
+    # E.g. getNthSubkeysLetters(1, 3, 'ABCABCABC') returns 'AAA'
+    #      getNthSubkeysLetters(2, 3, 'ABCABCABC') returns 'BBB'
+    #      getNthSubkeysLetters(3, 3, 'ABCABCABC') returns 'CCC'
+    #      getNthSubkeysLetters(1, 5, 'ABCDEFGHI') returns 'AF'
+
+    # Use a regular expression to remove non-letters from the message.
+    message = NONLETTERS_PATTERN.sub('', message)
+
+    i = n - 1
+    letters = []
+    while i < len(message):
+        letters.append(message[i])
+        i += keyLength
+    return ''.join(letters)
+
+
+def attemptHackWithKeyLength(ciphertext, mostLikelyKeyLength):
+    # Determine the most likely letters for each letter in the key.
+    ciphertextUp = ciphertext.upper()
+    # allFreqScores is a list of mostLikelyKeyLength number of lists.
+    # These inner lists are the freqScores lists.
+    allFreqScores = []
+    for nth in range(1, mostLikelyKeyLength + 1):
+        nthLetters = getNthSubkeysLetters(nth, mostLikelyKeyLength, ciphertextUp)
+
+        # freqScores is a list of tuples like:
+        # [(<letter>, <Eng. Freq. match score>), ... ]
+        # List is sorted by match score. Higher score means better match.
+        # See the englishFreqMatchScore() comments in freqAnalysis.py.
+        freqScores = []
+        for possibleKey in LETTERS:
+            decryptedText = vigenereCipher.decryptMessage(possibleKey, nthLetters)
+            keyAndFreqMatchTuple = (possibleKey, freqAnalysis.englishFreqMatchScore(decryptedText))
+            freqScores.append(keyAndFreqMatchTuple)
+        # Sort by match score
+        freqScores.sort(key=getItemAtIndexOne, reverse=True)
+
+        allFreqScores.append(freqScores[:NUM_MOST_FREQ_LETTERS])
+
+    if not SILENT_MODE:
+        for i in range(len(allFreqScores)):
+            # use i + 1 so the first letter is not called the "0th" letter
+            print('Possible letters for letter %s of the key: ' % (i + 1), end='')
+            for freqScore in allFreqScores[i]:
+                print('%s ' % freqScore[0], end='')
+            print() # print a newline
+
+    # Try every combination of the most likely letters for each position
+    # in the key.
+    for indexes in itertools.product(range(NUM_MOST_FREQ_LETTERS), repeat=mostLikelyKeyLength):
+        # Create a possible key from the letters in allFreqScores
+        possibleKey = ''
+        for i in range(mostLikelyKeyLength):
+            possibleKey += allFreqScores[i][indexes[i]][0]
+
+        #if not SILENT_MODE:
+            #print('Attempting with key: %s' % (possibleKey))
+
+        decryptedText = vigenereCipher.decryptMessage(possibleKey, ciphertextUp)
+
+        if detectEnglish.isEnglish(decryptedText):
+            # Set the hacked ciphertext to the original casing.
+            origCase = []
+            for i in range(len(ciphertext)):
+                if ciphertext[i].isupper():
+                    origCase.append(decryptedText[i].upper())
+                else:
+                    origCase.append(decryptedText[i].lower())
+            decryptedText = ''.join(origCase)
+
+            # Check with user to see if the key has been found.
+            print('Possible encryption hack with key %s:' % (possibleKey))
+            print(decryptedText[:200]) # only show first 200 characters
+            print()
+            print('Enter D for done, or just press Enter to continue hacking:')
+            response = input('> ')
+
+            if response.strip().upper().startswith('D'):
+                return decryptedText
+
+    # No English-looking decryption found, so return None.
+    return None
+
+
+def hackVigenere(ciphertext):
+    # First, we need to do Kasiski Examination to figure out what the
+    # length of the ciphertext's encryption key is.
+    allLikelyKeyLengths = kasiskiExamination(ciphertext)
+    if not SILENT_MODE:
+        keyLengthStr = ''
+        for keyLength in allLikelyKeyLengths:
+            keyLengthStr += '%s ' % (keyLength)
+        print('Kasiski Examination results say the most likely key lengths are: ' + keyLengthStr + '\n')
+
+    for keyLength in allLikelyKeyLengths:
+        if not SILENT_MODE:
+            print('Attempting hack with key length %s (%s possible keys)...' % (keyLength, NUM_MOST_FREQ_LETTERS ** keyLength))
+        hackedMessage = attemptHackWithKeyLength(ciphertext, keyLength)
+        if hackedMessage != None:
+            break
+
+    # If none of the key lengths we found using Kasiski Examination
+    # worked, start brute-forcing through key lengths.
+    if hackedMessage == None:
+        if not SILENT_MODE:
+            print('Unable to hack message with likely key length(s). Brute forcing key length...')
+        for keyLength in range(1, MAX_KEY_LENGTH + 1):
+            # don't re-check key lengths already tried from Kasiski
+            if keyLength not in allLikelyKeyLengths:
+                if not SILENT_MODE:
+                    print('Attempting hack with key length %s (%s possible keys)...' % (keyLength, NUM_MOST_FREQ_LETTERS ** keyLength))
+                hackedMessage = attemptHackWithKeyLength(ciphertext, keyLength)
+                if hackedMessage != None:
+                    break
+    return hackedMessage
+
+
+# If vigenereHacker.py is run (instead of imported as a module) call
+# the main() function.
+if __name__ == '__main__':
+    main()
+
+
+# Problem 2:
+part_a_var_english=10.4056677352
+
+part_b_var_plaintext=9.94752628402
+
+
+part_c_var_ciphertexts=[5.09903007692, 3.11028434467, 2.35548526775, 1.58248143787, 1.40236753994]
+
+part_c_explain="The longer the key is, the less variance there is (when using subsequent lettering schemes.)"
+
+part_d_means=[3.84611538462, 3.84619230769, 3.84603846154, 3.84615384615, 3.84619230769]
+
+part_d_explain="As the key increases in length, the mean increases in size. It is inverse to the population variance. If the population is varied, then the mean is higher (3.847...), as where if you use subsequent lettering schemes, the mean will be low because the variance is low."
+
+part_e_means=[2.70992973343]
+
+part_e_explain="Yes, Kasiski attacks allow for an adversary to learn the key length by seeing consecutive occurrences of strings that are close to the length of the key. The mean suggests that by taking the greatest common divisor amongst the distances of repeated letters/strings, we will be able to learn the length of the key."
+
+websites used -> http://www.miniwebtool.com/population-variance-calculator/
+http://www.cs.du.edu/~snarayan/crypt/vigenere.html
+
+code used for letter frequency -> via kpsubedi on Git (create input.txt file in the same directory)
+from sys import argv
+import os
+
+if __name__ == '__main__':
+    """Tool for analysing an input text, and outputting a frequency
+    analysis of mono/dia/trigrams in a given input text. Takes the input file and runs through it, saving the
+    ammount of times a character and dia/trigrams is present. Then outputs the given values to 2 .txt files.
+    If a british english text is given as a input file, a representation close to the frequency of letters of the english alphabet should be outputtet."""
+    os.system('clear')
+
+    # Check if enough argument were given
+    argcount = 0
+    for arg in argv:
+        argcount += 1
+    if argcount < 2:
+        print "Error: No input file spesified"
+
+    script, inputfile = argv
+
+    # Open files for reading and writing
+    input = open(inputfile, 'r')
+    output1 = open("output1.txt", 'w')
+    output2 = open("output2.txt", 'w')
+
+    # Declare variables to scope
+    dict = {}
+    count = [0, 0]
+
+    # Itereate lines in input file
+    for line in input:
+        line = line.upper() # Clean line
+
+        # For every leagal permutation
+        for i in xrange(0, len(line)):
+            # Mono-, dia- and trigrams
+            for j in xrange(1, 4):
+                ch = line[i:i+j] # Substring w/ *gram
+
+                # Continue if not all letters
+                if not ch.isalpha(): continue
+
+                # Lazy create and inc counter
+                if ch in dict:
+                    dict[ch] += 1
+                else:
+                    dict[ch] = 1
+
+                # Increment total number of *grams
+                count[0 if len(ch) < 2 else 1] += 1
+
+    # Print all monograms to file
+    for key, value in sorted(dict.iteritems()):
+        if len(key) > 1: continue
+        output1.write("{2:.3%}\n".format(
+                key, value, float(value)/float(count[0])))
+
+    # Print all di- and trigrams to file
+    for key, value in sorted(dict.iteritems(),
+                             key=lambda (k, v): (v, k), reverse=True):
+        if len(key) <= 1: continue
+        output2.write("{0}: {2:.3%}\n".format(
+                key, value, float(value)/float(count[0])))
+
+    print "Successfully analyzed %s" % inputfile
+
+    # Close files before finish
+    input.close()
+    output1.close()
+    output2.close()
